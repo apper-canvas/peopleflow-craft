@@ -242,16 +242,46 @@ const MainFeature = () => {
     return { status: 'not-signed-in', checkIn: null, checkOut: null }
   }
 
+  const calculateTotalHours = (checkIn, checkOut) => {
+    if (!checkIn || !checkOut) return null
+    
+    const [checkInHour, checkInMin] = checkIn.split(':').map(Number)
+    const [checkOutHour, checkOutMin] = checkOut.split(':').map(Number)
+    
+    const checkInDate = new Date()
+    checkInDate.setHours(checkInHour, checkInMin, 0, 0)
+    
+    const checkOutDate = new Date()
+    checkOutDate.setHours(checkOutHour, checkOutMin, 0, 0)
+    
+    const diffMs = checkOutDate - checkInDate
+    const totalMinutes = Math.floor(diffMs / (1000 * 60))
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+    
+    return `${hours}h ${minutes}m`
+  }
+
   const handleAddProject = (e) => {
     e.preventDefault()
     if (newProject.name && newProject.description && newProject.startDate && newProject.deadline) {
       if (isEditMode && editingProject) {
         // Update existing project
-        const updatedProjects = projects.map(p => 
-          p.id === editingProject.id 
-            ? {
+    if (!record) return { status: 'not-signed-in', checkIn: null, checkOut: null, totalHours: null }
+    if (record.checkIn && !record.checkOut) return { 
+      status: 'signed-in', 
+      checkIn: record.checkIn, 
+      checkOut: null, 
+      totalHours: null 
+    }
+    if (record.checkIn && record.checkOut) return { 
+      status: 'completed', 
+      checkIn: record.checkIn, 
+      checkOut: record.checkOut, 
+      totalHours: calculateTotalHours(record.checkIn, record.checkOut)
+    }
                 ...p,
-                ...newProject,
+    return { status: 'not-signed-in', checkIn: null, checkOut: null, totalHours: null }
                 startDate: new Date(newProject.startDate),
                 deadline: new Date(newProject.deadline)
               }
@@ -724,6 +754,7 @@ const MainFeature = () => {
                 <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Employee</th>
                 <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Check-In</th>
                 <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Check-Out</th>
+                <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Total Hours</th>
                 <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Action</th>
               </tr>
             </thead>
@@ -758,6 +789,15 @@ const MainFeature = () => {
                       {attendanceStatus.checkOut ? (
                         <span className="text-blue-600 dark:text-blue-400 font-medium">
                           {attendanceStatus.checkOut}
+                        </span>
+                      ) : (
+                        <span className="text-surface-400 dark:text-surface-500">-</span>
+                      )}
+                    </td>
+                    <td className="py-4">
+                      {attendanceStatus.totalHours ? (
+                        <span className="text-purple-600 dark:text-purple-400 font-medium">
+                          {attendanceStatus.totalHours}
                         </span>
                       ) : (
                         <span className="text-surface-400 dark:text-surface-500">-</span>
