@@ -41,7 +41,9 @@ const MainFeature = () => {
   const [newEmployee, setNewEmployee] = useState({
     employeeId: '',
     name: '',
+    dateOfBirth: '',
     department: '',
+    gender: '',
     position: '',
     email: '',
     phoneNumber: ''
@@ -99,7 +101,7 @@ const MainFeature = () => {
         avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`
       }
       setEmployees([...employees, employee])
-      setNewEmployee({ employeeId: '', name: '', department: '', position: '', email: '', phoneNumber: '' })
+      setNewEmployee({ employeeId: '', name: '', dateOfBirth: '', department: '', gender: '', position: '', email: '', phoneNumber: '' })
       setShowAddForm(false)
       toast.success(`Employee ${newEmployee.name} added successfully!`)
     } else {
@@ -226,6 +228,25 @@ const MainFeature = () => {
                 className="input-field"
                 required
               />
+                type="date"
+                placeholder="Date of Birth"
+                value={newEmployee.dateOfBirth}
+                onChange={(e) => setNewEmployee({...newEmployee, dateOfBirth: e.target.value})}
+                className="input-field"
+                required
+              />
+              <select
+                value={newEmployee.gender}
+                onChange={(e) => setNewEmployee({...newEmployee, gender: e.target.value})}
+                className="input-field"
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+              <input
               <input
                 type="text"
                 placeholder="Position"
