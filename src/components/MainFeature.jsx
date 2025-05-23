@@ -226,6 +226,8 @@ const MainFeature = () => {
                 className="input-field"
                 required
               />
+              <input
+                type="text"
                 placeholder="Position"
                 value={newEmployee.position}
                 onChange={(e) => setNewEmployee({...newEmployee, position: e.target.value})}
