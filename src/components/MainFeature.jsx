@@ -101,6 +101,7 @@ const MainFeature = () => {
 
   const [attendanceLoading, setAttendanceLoading] = useState(false)
   const [isAttendanceFormVisible, setIsAttendanceFormVisible] = useState(false)
+  const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState(null)
 
   const projectStatuses = ['open', 'in-progress', 'completed']
 
@@ -270,6 +271,14 @@ const MainFeature = () => {
     const minutes = totalMinutes % 60
     
     return `${hours}h ${minutes}m`
+  }
+
+  const handleEmployeeSelect = (employee) => {
+    setSelectedEmployeeDetails(employee)
+  }
+
+  const handleCloseEmployeeDetails = () => {
+    setSelectedEmployeeDetails(null)
   }
 
   const handleAddProject = (e) => {
@@ -730,7 +739,7 @@ const MainFeature = () => {
   )
 
   const renderAttendanceTracking = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h3 className="text-xl md:text-2xl font-semibold text-surface-900 dark:text-surface-100">
           Attendance Management
@@ -745,7 +754,7 @@ const MainFeature = () => {
         </div>
       </div>
 
-      <div className="card p-4 md:p-6">
+      <div className={`card p-4 md:p-6 transition-all duration-300 ${selectedEmployeeDetails ? 'lg:mr-96' : ''}`}>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -761,10 +770,14 @@ const MainFeature = () => {
               {employees.map((employee) => {
                 const attendanceStatus = getAttendanceStatus(employee.id)
                 return (
-                  <tr key={employee.id} className="hover:bg-surface-50 dark:hover:bg-surface-800/50">
+                  <tr 
+                    key={employee.id} 
+                    className="hover:bg-surface-50 dark:hover:bg-surface-800/50 cursor-pointer transition-colors duration-200"
+                    onClick={() => handleEmployeeSelect(employee)}
+                  >
                     <td className="py-4">
                       <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
                           <span className="text-white text-sm font-medium">
                             {employee.name.split(' ').map(n => n[0]).join('')}
                           </span>
@@ -809,6 +822,7 @@ const MainFeature = () => {
                         </span>
                       ) : (
                         <button
+                          onClick={(e) => e.stopPropagation()}
                           onClick={() => handleAttendanceToggle(employee.id, employee.name)}
                           disabled={attendanceLoading}
                           className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
@@ -832,6 +846,167 @@ const MainFeature = () => {
           </table>
         </div>
       </div>
+
+      {/* Employee Details Panel */}
+      {selectedEmployeeDetails && (
+        <motion.div
+          initial={{ opacity: 0, x: 300 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 300 }}
+          className="fixed top-0 right-0 h-full w-80 lg:w-96 bg-white dark:bg-surface-800 shadow-2xl z-50 overflow-y-auto border-l border-surface-200 dark:border-surface-700"
+        >
+          <div className="p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-surface-900 dark:text-surface-100">
+                Employee Details
+              </h3>
+              <button
+                onClick={handleCloseEmployeeDetails}
+                className="p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-200"
+              >
+                <ApperIcon name="X" className="h-5 w-5 text-surface-600 dark:text-surface-400" />
+              </button>
+            </div>
+
+            {/* Employee Avatar and Basic Info */}
+            <div className="text-center mb-6">
+              <div className="w-20 h-20 mx-auto mb-4">
+                <img
+                  src={selectedEmployeeDetails.avatar}
+                  alt={selectedEmployeeDetails.name}
+                  className="w-full h-full rounded-full object-cover ring-4 ring-primary/20"
+                />
+              </div>
+              <h4 className="text-lg font-semibold text-surface-900 dark:text-surface-100">
+                {selectedEmployeeDetails.name}
+              </h4>
+              <p className="text-surface-600 dark:text-surface-400">
+                {selectedEmployeeDetails.position}
+              </p>
+              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 mt-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                {selectedEmployeeDetails.status}
+              </div>
+            </div>
+
+            {/* Personal Information */}
+            <div className="mb-6">
+              <h5 className="text-sm font-semibold text-surface-900 dark:text-surface-100 mb-3 uppercase tracking-wide">
+                Personal Information
+              </h5>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <ApperIcon name="Building" className="h-4 w-4 text-surface-500 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-surface-500 dark:text-surface-400">Department</p>
+                    <p className="text-sm text-surface-900 dark:text-surface-100">{selectedEmployeeDetails.department}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <ApperIcon name="Mail" className="h-4 w-4 text-surface-500 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-surface-500 dark:text-surface-400">Email</p>
+                    <p className="text-sm text-surface-900 dark:text-surface-100 break-all">{selectedEmployeeDetails.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <ApperIcon name="Phone" className="h-4 w-4 text-surface-500 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-surface-500 dark:text-surface-400">Phone</p>
+                    <p className="text-sm text-surface-900 dark:text-surface-100">{selectedEmployeeDetails.phoneNumber || 'Not provided'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Professional Information */}
+            <div className="mb-6">
+              <h5 className="text-sm font-semibold text-surface-900 dark:text-surface-100 mb-3 uppercase tracking-wide">
+                Professional Information
+              </h5>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <ApperIcon name="IdCard" className="h-4 w-4 text-surface-500 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-surface-500 dark:text-surface-400">Employee ID</p>
+                    <p className="text-sm text-surface-900 dark:text-surface-100">{selectedEmployeeDetails.employeeId || selectedEmployeeDetails.id}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <ApperIcon name="Calendar" className="h-4 w-4 text-surface-500 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-surface-500 dark:text-surface-400">Date Joining</p>
+                    <p className="text-sm text-surface-900 dark:text-surface-100">{selectedEmployeeDetails.dateJoining || 'Not specified'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <ApperIcon name="MapPin" className="h-4 w-4 text-surface-500 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-surface-500 dark:text-surface-400">Work Location</p>
+                    <p className="text-sm text-surface-900 dark:text-surface-100">{selectedEmployeeDetails.workLocation || 'Not specified'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Today's Attendance */}
+            <div className="bg-surface-50 dark:bg-surface-700/50 rounded-lg p-4">
+              <h5 className="text-sm font-semibold text-surface-900 dark:text-surface-100 mb-3 uppercase tracking-wide">
+                Today's Attendance
+              </h5>
+              {(() => {
+                const attendanceStatus = getAttendanceStatus(selectedEmployeeDetails.id)
+                return (
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-surface-600 dark:text-surface-400">Check-In:</span>
+                      <span className="text-sm font-medium text-surface-900 dark:text-surface-100">
+                        {attendanceStatus.checkIn || '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-surface-600 dark:text-surface-400">Check-Out:</span>
+                      <span className="text-sm font-medium text-surface-900 dark:text-surface-100">
+                        {attendanceStatus.checkOut || '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-surface-600 dark:text-surface-400">Total Hours:</span>
+                      <span className="text-sm font-medium text-surface-900 dark:text-surface-100">
+                        {attendanceStatus.totalHours || '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-surface-600 dark:text-surface-400">Status:</span>
+                      <span className={`text-sm font-medium ${
+                        attendanceStatus.status === 'completed' ? 'text-green-600 dark:text-green-400' :
+                        attendanceStatus.status === 'signed-in' ? 'text-blue-600 dark:text-blue-400' :
+                        'text-surface-600 dark:text-surface-400'
+                      }`}>
+                        {attendanceStatus.status === 'not-signed-in' ? 'Not signed in' :
+                         attendanceStatus.status === 'signed-in' ? 'Currently signed in' :
+                         'Completed'}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Overlay */}
+      {selectedEmployeeDetails && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+          onClick={handleCloseEmployeeDetails}
+        />
+      )}
     </div>
   )
 
