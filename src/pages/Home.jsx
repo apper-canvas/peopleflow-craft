@@ -1,10 +1,24 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import ApperIcon from '../components/ApperIcon'
 import MainFeature from '../components/MainFeature'
 
 const Home = ({ isDarkMode, setIsDarkMode }) => {
+  const mainFeatureRef = useRef(null)
+
+  const handleQuickAction = (action) => {
+    if (action === 'Add Employee') {
+      mainFeatureRef.current?.activateTab('employees')
+      mainFeatureRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else if (action === 'Track Attendance') {
+      mainFeatureRef.current?.activateTab('attendance')
+      mainFeatureRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else if (action === 'Performance Review') {
+      window.location.href = '/performance-metrics'
+    }
+  }
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -128,7 +142,7 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
         </motion.div>
 
         {/* Main Feature Component */}
-        <MainFeature />
+        <MainFeature ref={mainFeatureRef} />
 
         {/* Quick Actions */}
         <motion.div 
@@ -163,6 +177,7 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
             ].map((action, index) => (
               <motion.div
                 key={action.title}
+                onClick={() => handleQuickAction(action.title)}
                 className="group card p-6 hover:shadow-soft cursor-pointer transition-all duration-300"
                 whileHover={{ y: -4 }}
                 initial={{ opacity: 0, y: 20 }}

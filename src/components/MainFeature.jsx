@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import { format, addDays, subDays, startOfWeek, endOfWeek } from 'date-fns'
 import ApperIcon from './ApperIcon'
 
-const MainFeature = () => {
+const MainFeature = forwardRef((props, ref) => {
   const [activeTab, setActiveTab] = useState('employees')
   const [employees, setEmployees] = useState([
     {
@@ -112,6 +112,18 @@ const MainFeature = () => {
   ]
 
   const departments = ['Engineering', 'Design', 'Marketing', 'Sales', 'HR', 'Finance']
+
+  useImperativeHandle(ref, () => ({
+    activateTab: (tabId) => {
+      setActiveTab(tabId)
+      if (tabId === 'employees') {
+        // Auto-open the Add Employee form when navigated from Quick Actions
+        setTimeout(() => {
+          setShowAddForm(true)
+        }, 300)
+      }
+    }
+  }))
 
   const handleAddEmployee = (e) => {
     e.preventDefault()
@@ -1374,6 +1386,6 @@ const MainFeature = () => {
       </AnimatePresence>
     </motion.div>
   )
-}
+})
 
 export default MainFeature
