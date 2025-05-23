@@ -495,7 +495,6 @@ const MainFeature = () => {
                   <label className="block text-sm font-medium text-surface-900 dark:text-surface-100 mb-1">
                     Deadline
                   </label>
-                  <input
                 <input
                   type="date"
                   value={newProject.deadline}
