@@ -50,7 +50,8 @@ const MainFeature = () => {
     employmentType: '',
     dateJoining: '',
     reportingManager: '',
-    workLocation: ''
+    workLocation: '',
+    notes: ''
   })
   const [showAddForm, setShowAddForm] = useState(false)
   const [projects, setProjects] = useState([
@@ -106,7 +107,7 @@ const MainFeature = () => {
         avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`
       }
       setEmployees([...employees, employee])
-      setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '', reportingManager: '', workLocation: '' })
+      setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '', reportingManager: '', workLocation: '', notes: '' })
       setShowAddForm(false)
       toast.success(`Employee ${newEmployee.name} added successfully!`)
     } else {
@@ -326,6 +327,14 @@ const MainFeature = () => {
                 required
               />
               <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
+              <div className="md:col-span-2">
+                <textarea
+                  placeholder="Notes/Remarks (Optional)"
+                  value={newEmployee.notes}
+                  onChange={(e) => setNewEmployee({...newEmployee, notes: e.target.value})}
+                  className="input-field resize-none h-20"
+                />
+              </div>
                 <button type="submit" className="btn-primary flex-1">
                   Add Employee
                 </button>
