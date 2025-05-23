@@ -229,6 +229,7 @@ const MainFeature = () => {
                 className="input-field"
                 required
               />
+              <input
                 type="email"
                 placeholder="Email Address"
                 value={newEmployee.email}
@@ -244,7 +245,6 @@ const MainFeature = () => {
                 className="input-field"
                 required
               />
-              <input
               <input
                 type="date"
                 placeholder="Date of Birth"
@@ -495,6 +495,7 @@ const MainFeature = () => {
                   <label className="block text-sm font-medium text-surface-900 dark:text-surface-100 mb-1">
                     Deadline
                   </label>
+                  <input
                 <input
                   type="date"
                   value={newProject.deadline}
