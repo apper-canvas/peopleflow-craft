@@ -626,7 +626,7 @@ const MainFeature = () => {
                   Cancel
                 </button>
               </div>
-              </div>
+            </form>
             </form>
           </motion.div>
         )}
