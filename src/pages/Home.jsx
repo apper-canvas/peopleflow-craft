@@ -68,7 +68,6 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
                 <ApperIcon name="User" className="h-4 w-4" />
                 <span>Employee Portal</span>
               </Link>
-              <button
               <div className="hidden sm:flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
                 <ApperIcon name="Users" className="h-4 w-4" />
                 <span>Admin Dashboard</span>
