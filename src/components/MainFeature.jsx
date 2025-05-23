@@ -620,11 +620,12 @@ const MainFeature = () => {
                     setEditingProject(null)
                     setIsEditMode(false)
                     setNewProject({ name: '', description: '', startDate: '', deadline: '', assignedEmployees: [], status: 'open', notes: '', comments: '' })
-                    setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '', reportingManager: '', workLocation: '' })
+                  }}
                   className="btn-secondary flex-1"
                 >
                   Cancel
                 </button>
+              </div>
               </div>
             </form>
           </motion.div>
