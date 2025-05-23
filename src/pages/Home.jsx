@@ -1,5 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import ApperIcon from '../components/ApperIcon'
 import MainFeature from '../components/MainFeature'
 
@@ -30,6 +31,22 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
             </motion.div>
             
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-2 rounded-lg bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 transition-all duration-200 shadow-card"
+              >
+                <ApperIcon 
+                  name={isDarkMode ? "Sun" : "Moon"} 
+                  className="h-5 w-5 text-surface-700 dark:text-surface-300" 
+                />
+              </button>
+              <Link
+                to="/employee-portal"
+                className="hidden sm:flex items-center space-x-2 px-3 py-2 rounded-lg bg-primary hover:bg-primary-dark text-white font-medium transition-all duration-200 shadow-card hover:shadow-soft"
+              >
+                <ApperIcon name="User" className="h-4 w-4" />
+                <span>Employee Portal</span>
+              </Link>
               <button
                 onClick={() => setIsDarkMode(!isDarkMode)}
                 className="p-2 rounded-lg bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 transition-all duration-200 shadow-card"

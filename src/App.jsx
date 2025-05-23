@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
+import EmployeeSelfService from './components/EmployeeSelfService'
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -16,6 +17,10 @@ function App() {
             <Route 
               path="/" 
               element={<Home isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />} 
+            />
+            <Route 
+              path="/employee-portal" 
+              element={<EmployeeSelfService isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />} 
             />
             <Route path="*" element={<NotFound />} />
           </Routes>
