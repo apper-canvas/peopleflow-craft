@@ -66,10 +66,16 @@ const MainFeature = () => {
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
+    startDate: '',
     deadline: '',
-    assignedEmployees: []
+    assignedEmployees: [],
+    status: 'open',
+    notes: '',
+    comments: ''
   })
   const [showProjectForm, setShowProjectForm] = useState(false)
+
+  const projectStatuses = ['open', 'in-progress', 'completed']
 
   const tabs = [
     { id: 'employees', label: 'Employee Management', icon: 'Users' },
@@ -104,16 +110,16 @@ const MainFeature = () => {
 
   const handleAddProject = (e) => {
     e.preventDefault()
-    if (newProject.name && newProject.description && newProject.deadline) {
+    if (newProject.name && newProject.description && newProject.startDate && newProject.deadline) {
       const project = {
         id: projects.length + 1,
         ...newProject,
-        status: 'planning',
+        startDate: new Date(newProject.startDate),
         deadline: new Date(newProject.deadline),
         assignedEmployees: newProject.assignedEmployees
       }
       setProjects([...projects, project])
-      setNewProject({ name: '', description: '', deadline: '', assignedEmployees: [] })
+      setNewProject({ name: '', description: '', startDate: '', deadline: '', assignedEmployees: [], status: 'open', notes: '', comments: '' })
       setShowProjectForm(false)
       toast.success(`Project "${newProject.name}" created successfully!`)
     } else {
@@ -382,6 +388,36 @@ const MainFeature = () => {
                   className="input-field"
                   required
                 />
+                <select
+                  value={newProject.status}
+                  onChange={(e) => setNewProject({...newProject, status: e.target.value})}
+                  className="input-field"
+                  required
+                >
+                  <option value="">Select Status</option>
+                  <option value="open">Open</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-surface-900 dark:text-surface-100 mb-1">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={newProject.startDate}
+                    onChange={(e) => setNewProject({...newProject, startDate: e.target.value})}
+                    className="input-field"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-surface-900 dark:text-surface-100 mb-1">
+                    Deadline
+                  </label>
                 <input
                   type="date"
                   value={newProject.deadline}
@@ -389,14 +425,41 @@ const MainFeature = () => {
                   className="input-field"
                   required
                 />
+                </div>
               </div>
+              
               <textarea
                 placeholder="Project Description"
                 value={newProject.description}
                 onChange={(e) => setNewProject({...newProject, description: e.target.value})}
-                className="input-field resize-none h-24"
+                className="input-field resize-none h-20"
                 required
               />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-surface-900 dark:text-surface-100 mb-1">
+                    Notes
+                  </label>
+                  <textarea
+                    placeholder="Additional project notes..."
+                    value={newProject.notes}
+                    onChange={(e) => setNewProject({...newProject, notes: e.target.value})}
+                    className="input-field resize-none h-20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-surface-900 dark:text-surface-100 mb-1">
+                    Comments
+                  </label>
+                  <textarea
+                    placeholder="Project comments..."
+                    value={newProject.comments}
+                    onChange={(e) => setNewProject({...newProject, comments: e.target.value})}
+                    className="input-field resize-none h-20"
+                  />
+                </div>
+              </div>
               
               <div>
                 <label className="block text-sm font-medium text-surface-900 dark:text-surface-100 mb-2">
