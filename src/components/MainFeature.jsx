@@ -74,6 +74,8 @@ const MainFeature = () => {
     comments: ''
   })
   const [showProjectForm, setShowProjectForm] = useState(false)
+  const [editingProject, setEditingProject] = useState(null)
+  const [isEditMode, setIsEditMode] = useState(false)
 
   const projectStatuses = ['open', 'in-progress', 'completed']
 
@@ -111,20 +113,55 @@ const MainFeature = () => {
   const handleAddProject = (e) => {
     e.preventDefault()
     if (newProject.name && newProject.description && newProject.startDate && newProject.deadline) {
-      const project = {
-        id: projects.length + 1,
-        ...newProject,
-        startDate: new Date(newProject.startDate),
-        deadline: new Date(newProject.deadline),
-        assignedEmployees: newProject.assignedEmployees
+      if (isEditMode && editingProject) {
+        // Update existing project
+        const updatedProjects = projects.map(p => 
+          p.id === editingProject.id 
+            ? {
+                ...p,
+                ...newProject,
+                startDate: new Date(newProject.startDate),
+                deadline: new Date(newProject.deadline)
+              }
+            : p
+        )
+        setProjects(updatedProjects)
+        toast.success(`Project "${newProject.name}" updated successfully!`)
+      } else {
+        // Create new project
+        const project = {
+          id: projects.length + 1,
+          ...newProject,
+          startDate: new Date(newProject.startDate),
+          deadline: new Date(newProject.deadline),
+          assignedEmployees: newProject.assignedEmployees
+        }
+        setProjects([...projects, project])
+        toast.success(`Project "${newProject.name}" created successfully!`)
       }
-      setProjects([...projects, project])
       setNewProject({ name: '', description: '', startDate: '', deadline: '', assignedEmployees: [], status: 'open', notes: '', comments: '' })
       setShowProjectForm(false)
-      toast.success(`Project "${newProject.name}" created successfully!`)
+      setEditingProject(null)
+      setIsEditMode(false)
     } else {
       toast.error('Please fill in all required fields')
     }
+  const handleEditProject = (project) => {
+    setNewProject({
+      name: project.name,
+      description: project.description,
+      startDate: format(project.startDate || new Date(), 'yyyy-MM-dd'),
+      deadline: format(project.deadline, 'yyyy-MM-dd'),
+      assignedEmployees: project.assignedEmployees || [],
+      status: project.status,
+      notes: project.notes || '',
+      comments: project.comments || ''
+    })
+    setEditingProject(project)
+    setIsEditMode(true)
+    setShowProjectForm(true)
+  }
+
   }
 
   const toggleEmployeeAssignment = (employeeId) => {
@@ -376,7 +413,7 @@ const MainFeature = () => {
             className="card p-4 md:p-6"
           >
             <h4 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">
-              Create New Project
+              {isEditMode ? 'Edit Project' : 'Create New Project'}
             </h4>
             <form onSubmit={handleAddProject} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -492,11 +529,16 @@ const MainFeature = () => {
               
               <div className="flex flex-col sm:flex-row gap-3">
                 <button type="submit" className="btn-primary flex-1">
-                  Create Project
+                  {isEditMode ? 'Update Project' : 'Create Project'}
                 </button>
                 <button 
                   type="button"
-                  onClick={() => setShowProjectForm(false)}
+                  onClick={() => {
+                    setShowProjectForm(false)
+                    setEditingProject(null)
+                    setIsEditMode(false)
+                    setNewProject({ name: '', description: '', startDate: '', deadline: '', assignedEmployees: [], status: 'open', notes: '', comments: '' })
+                  }}
                   className="btn-secondary flex-1"
                 >
                   Cancel
@@ -520,6 +562,14 @@ const MainFeature = () => {
               <h4 className="text-lg font-semibold text-surface-900 dark:text-surface-100">
                 {project.name}
               </h4>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => handleEditProject(project)}
+                  className="p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-200"
+                  title="Edit Project"
+                >
+                  <ApperIcon name="Edit" className="h-4 w-4 text-surface-600 dark:text-surface-400" />
+                </button>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                 project.status === 'in-progress' 
                   ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
@@ -527,6 +577,7 @@ const MainFeature = () => {
               }`}>
                 {project.status.replace('-', ' ')}
               </span>
+              </div>
             </div>
 
             <div className="mb-4">
