@@ -48,7 +48,9 @@ const MainFeature = () => {
     department: '',
     jobTitle: '',
     employmentType: '',
-    dateJoining: ''
+    dateJoining: '',
+    reportingManager: '',
+    workLocation: ''
   })
   const [showAddForm, setShowAddForm] = useState(false)
   const [projects, setProjects] = useState([
@@ -95,7 +97,7 @@ const MainFeature = () => {
 
   const handleAddEmployee = (e) => {
     e.preventDefault()
-    if (newEmployee.employeeId && newEmployee.name && newEmployee.email && newEmployee.phoneNumber && newEmployee.department && newEmployee.jobTitle && newEmployee.employmentType && newEmployee.dateJoining) {
+    if (newEmployee.employeeId && newEmployee.name && newEmployee.email && newEmployee.phoneNumber && newEmployee.department && newEmployee.jobTitle && newEmployee.employmentType && newEmployee.dateJoining && newEmployee.reportingManager && newEmployee.workLocation) {
       const employee = {
         id: employees.length + 1,
         ...newEmployee,
@@ -104,7 +106,7 @@ const MainFeature = () => {
         avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`
       }
       setEmployees([...employees, employee])
-      setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '' })
+      setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '', reportingManager: '', workLocation: '' })
       setShowAddForm(false)
       toast.success(`Employee ${newEmployee.name} added successfully!`)
     } else {
@@ -301,6 +303,25 @@ const MainFeature = () => {
                 placeholder="Date Joining"
                 value={newEmployee.dateJoining}
                 onChange={(e) => setNewEmployee({...newEmployee, dateJoining: e.target.value})}
+                className="input-field"
+                required
+              />
+              <select
+                value={newEmployee.reportingManager}
+                onChange={(e) => setNewEmployee({...newEmployee, reportingManager: e.target.value})}
+                className="input-field"
+                required
+              >
+                <option value="">Select Reporting Manager</option>
+                {employees.map(emp => (
+                  <option key={emp.id} value={emp.name}>{emp.name}</option>
+                ))}
+              </select>
+              <input
+                type="text"
+                placeholder="Work Location"
+                value={newEmployee.workLocation}
+                onChange={(e) => setNewEmployee({...newEmployee, workLocation: e.target.value})}
                 className="input-field"
                 required
               />
@@ -599,7 +620,7 @@ const MainFeature = () => {
                     setEditingProject(null)
                     setIsEditMode(false)
                     setNewProject({ name: '', description: '', startDate: '', deadline: '', assignedEmployees: [], status: 'open', notes: '', comments: '' })
-                  }}
+                    setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '', reportingManager: '', workLocation: '' })
                   className="btn-secondary flex-1"
                 >
                   Cancel
