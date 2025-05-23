@@ -41,12 +41,12 @@ const MainFeature = () => {
   const [newEmployee, setNewEmployee] = useState({
     employeeId: '',
     name: '',
-    dateOfBirth: '',
-    department: '',
-    gender: '',
-    position: '',
     email: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    dateOfBirth: '',
+    gender: '',
+    department: '',
+    jobTitle: ''
   })
   const [showAddForm, setShowAddForm] = useState(false)
   const [projects, setProjects] = useState([
@@ -93,15 +93,16 @@ const MainFeature = () => {
 
   const handleAddEmployee = (e) => {
     e.preventDefault()
-    if (newEmployee.employeeId && newEmployee.name && newEmployee.email && newEmployee.phoneNumber) {
+    if (newEmployee.employeeId && newEmployee.name && newEmployee.email && newEmployee.phoneNumber && newEmployee.department && newEmployee.jobTitle) {
       const employee = {
         id: employees.length + 1,
         ...newEmployee,
+        position: newEmployee.jobTitle,
         status: 'active',
         avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`
       }
       setEmployees([...employees, employee])
-      setNewEmployee({ employeeId: '', name: '', dateOfBirth: '', department: '', gender: '', position: '', email: '', phoneNumber: '' })
+      setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '' })
       setShowAddForm(false)
       toast.success(`Employee ${newEmployee.name} added successfully!`)
     } else {
@@ -228,6 +229,22 @@ const MainFeature = () => {
                 className="input-field"
                 required
               />
+                type="email"
+                placeholder="Email Address"
+                value={newEmployee.email}
+                onChange={(e) => setNewEmployee({...newEmployee, email: e.target.value})}
+                className="input-field"
+                required
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                value={newEmployee.phoneNumber}
+                onChange={(e) => setNewEmployee({...newEmployee, phoneNumber: e.target.value})}
+                className="input-field"
+                required
+              />
+              <input
               <input
                 type="date"
                 placeholder="Date of Birth"
@@ -247,27 +264,22 @@ const MainFeature = () => {
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
+              <select
+                value={newEmployee.department}
+                onChange={(e) => setNewEmployee({...newEmployee, department: e.target.value})}
+                className="input-field"
+                required
+              >
+                <option value="">Select Department</option>
+                {departments.map(dept => (
+                  <option key={dept} value={dept}>{dept}</option>
+                ))}
+              </select>
               <input
                 type="text"
-                placeholder="Position"
-                value={newEmployee.position}
-                onChange={(e) => setNewEmployee({...newEmployee, position: e.target.value})}
-                className="input-field"
-                required
-              />
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={newEmployee.email}
-                onChange={(e) => setNewEmployee({...newEmployee, email: e.target.value})}
-                className="input-field"
-                required
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={newEmployee.phoneNumber}
-                onChange={(e) => setNewEmployee({...newEmployee, phoneNumber: e.target.value})}
+                placeholder="Job Title"
+                value={newEmployee.jobTitle}
+                onChange={(e) => setNewEmployee({...newEmployee, jobTitle: e.target.value})}
                 className="input-field"
                 required
               />
