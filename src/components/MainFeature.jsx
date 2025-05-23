@@ -235,11 +235,21 @@ const MainFeature = () => {
     const recordKey = `${employeeId}-${today}`
     const record = attendanceRecords[recordKey]
     
-    if (!record) return { status: 'not-signed-in', checkIn: null, checkOut: null }
-    if (record.checkIn && !record.checkOut) return { status: 'signed-in', checkIn: record.checkIn, checkOut: null }
-    if (record.checkIn && record.checkOut) return { status: 'completed', checkIn: record.checkIn, checkOut: record.checkOut }
+    if (!record) return { status: 'not-signed-in', checkIn: null, checkOut: null, totalHours: null }
+    if (record.checkIn && !record.checkOut) return { 
+      status: 'signed-in', 
+      checkIn: record.checkIn, 
+      checkOut: null, 
+      totalHours: null 
+    }
+    if (record.checkIn && record.checkOut) return { 
+      status: 'completed', 
+      checkIn: record.checkIn, 
+      checkOut: record.checkOut, 
+      totalHours: calculateTotalHours(record.checkIn, record.checkOut)
+    }
     
-    return { status: 'not-signed-in', checkIn: null, checkOut: null }
+    return { status: 'not-signed-in', checkIn: null, checkOut: null, totalHours: null }
   }
 
   const calculateTotalHours = (checkIn, checkOut) => {
@@ -267,21 +277,11 @@ const MainFeature = () => {
     if (newProject.name && newProject.description && newProject.startDate && newProject.deadline) {
       if (isEditMode && editingProject) {
         // Update existing project
-    if (!record) return { status: 'not-signed-in', checkIn: null, checkOut: null, totalHours: null }
-    if (record.checkIn && !record.checkOut) return { 
-      status: 'signed-in', 
-      checkIn: record.checkIn, 
-      checkOut: null, 
-      totalHours: null 
-    }
-    if (record.checkIn && record.checkOut) return { 
-      status: 'completed', 
-      checkIn: record.checkIn, 
-      checkOut: record.checkOut, 
-      totalHours: calculateTotalHours(record.checkIn, record.checkOut)
-    }
+        const updatedProjects = projects.map(p => 
+          p.id === editingProject.id 
+            ? {
                 ...p,
-    return { status: 'not-signed-in', checkIn: null, checkOut: null, totalHours: null }
+                ...newProject,
                 startDate: new Date(newProject.startDate),
                 deadline: new Date(newProject.deadline)
               }
@@ -552,7 +552,6 @@ const MainFeature = () => {
                   placeholder="Email Address"
                   value={newEmployee.email}
                   onChange={(e) => setNewEmployee({...newEmployee, email: e.target.value})}
-
                   className="input-field"
                   required
                 />
