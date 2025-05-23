@@ -160,8 +160,10 @@ const MainFeature = () => {
               ...emp,
               ...newEmployee,
               position: newEmployee.jobTitle,
-              avatar: emp.avatar // Keep existing avatar
+              avatar: emp.avatar
+            }
 
+          : emp
       )
       setEmployees(updatedEmployees)
       setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '', reportingManager: '', workLocation: '', notes: '' })
@@ -446,7 +448,6 @@ const MainFeature = () => {
                 className="input-field"
                 required
               />
-              <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
               <div className="md:col-span-2">
                 <textarea
                   placeholder="Notes/Remarks (Optional)"
@@ -455,6 +456,7 @@ const MainFeature = () => {
                   className="input-field resize-none h-20"
                 />
               </div>
+              <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
                 <button type="submit" className="btn-primary flex-1">
                   Add Employee
                 </button>
@@ -519,6 +521,7 @@ const MainFeature = () => {
                   type="email"
                   placeholder="Email Address"
                   value={newEmployee.email}
+                  onChange={(e) => setNewEmployee({...newEmployee, email: e.target.value})}
 
                   className="input-field"
                   required
