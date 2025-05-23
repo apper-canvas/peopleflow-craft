@@ -54,6 +54,8 @@ const MainFeature = () => {
     notes: ''
   })
   const [showAddForm, setShowAddForm] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [editingEmployee, setEditingEmployee] = useState(null)
   const [projects, setProjects] = useState([
     {
       id: 1,
@@ -110,6 +112,49 @@ const MainFeature = () => {
       setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '', reportingManager: '', workLocation: '', notes: '' })
       setShowAddForm(false)
       toast.success(`Employee ${newEmployee.name} added successfully!`)
+    } else {
+      toast.error('Please fill in all required fields')
+    }
+  }
+
+  const handleEditEmployee = (employee) => {
+    setEditingEmployee(employee)
+    setNewEmployee({
+      employeeId: employee.employeeId || employee.id,
+      name: employee.name,
+      email: employee.email,
+      phoneNumber: employee.phoneNumber || '',
+      dateOfBirth: employee.dateOfBirth || '',
+      gender: employee.gender || '',
+      department: employee.department,
+      jobTitle: employee.position,
+      employmentType: employee.employmentType || 'Full-time',
+      dateJoining: employee.dateJoining || '',
+      reportingManager: employee.reportingManager || '',
+      workLocation: employee.workLocation || '',
+      notes: employee.notes || ''
+    })
+    setShowEditForm(true)
+  }
+
+  const handleUpdateEmployee = (e) => {
+    e.preventDefault()
+    if (newEmployee.employeeId && newEmployee.name && newEmployee.email && newEmployee.phoneNumber && newEmployee.department && newEmployee.jobTitle && newEmployee.employmentType && newEmployee.dateJoining && newEmployee.reportingManager && newEmployee.workLocation) {
+      const updatedEmployees = employees.map(emp => 
+        emp.id === editingEmployee.id 
+          ? {
+              ...emp,
+              ...newEmployee,
+              position: newEmployee.jobTitle,
+              avatar: emp.avatar // Keep existing avatar
+            }
+          : emp
+      )
+      setEmployees(updatedEmployees)
+      setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '', reportingManager: '', workLocation: '', notes: '' })
+      setShowEditForm(false)
+      setEditingEmployee(null)
+      toast.success(`Employee ${newEmployee.name} updated successfully!`)
     } else {
       toast.error('Please fill in all required fields')
     }
@@ -351,6 +396,172 @@ const MainFeature = () => {
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {showEditForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+            onClick={() => setShowEditForm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="card p-4 md:p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-semibold text-surface-900 dark:text-surface-100">
+                  Edit Employee - {editingEmployee?.name}
+                </h4>
+                <button
+                  onClick={() => setShowEditForm(false)}
+                  className="p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-200"
+                >
+                  <ApperIcon name="X" className="h-5 w-5" />
+                </button>
+              </div>
+              <form onSubmit={handleUpdateEmployee} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="Employee ID"
+                  value={newEmployee.employeeId}
+                  onChange={(e) => setNewEmployee({...newEmployee, employeeId: e.target.value})}
+                  className="input-field"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={newEmployee.name}
+                  onChange={(e) => setNewEmployee({...newEmployee, name: e.target.value})}
+                  className="input-field"
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  value={newEmployee.email}
+                  onChange={(e) => setNewEmployee({...newEmployee, email: e.target.value})}
+                  className="input-field"
+                  required
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone Number"
+                  value={newEmployee.phoneNumber}
+                  onChange={(e) => setNewEmployee({...newEmployee, phoneNumber: e.target.value})}
+                  className="input-field"
+                  required
+                />
+                <input
+                  type="date"
+                  placeholder="Date of Birth"
+                  value={newEmployee.dateOfBirth}
+                  onChange={(e) => setNewEmployee({...newEmployee, dateOfBirth: e.target.value})}
+                  className="input-field"
+                  required
+                />
+                <select
+                  value={newEmployee.gender}
+                  onChange={(e) => setNewEmployee({...newEmployee, gender: e.target.value})}
+                  className="input-field"
+                  required
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+                <select
+                  value={newEmployee.department}
+                  onChange={(e) => setNewEmployee({...newEmployee, department: e.target.value})}
+                  className="input-field"
+                  required
+                >
+                  <option value="">Select Department</option>
+                  {departments.map(dept => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  placeholder="Job Title"
+                  value={newEmployee.jobTitle}
+                  onChange={(e) => setNewEmployee({...newEmployee, jobTitle: e.target.value})}
+                  className="input-field"
+                  required
+                />
+                <select
+                  value={newEmployee.employmentType}
+                  onChange={(e) => setNewEmployee({...newEmployee, employmentType: e.target.value})}
+                  className="input-field"
+                  required
+                >
+                  <option value="">Select Employment Type</option>
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Contract">Contract</option>
+                </select>
+                <input
+                  type="date"
+                  placeholder="Date Joining"
+                  value={newEmployee.dateJoining}
+                  onChange={(e) => setNewEmployee({...newEmployee, dateJoining: e.target.value})}
+                  className="input-field"
+                  required
+                />
+                <select
+                  value={newEmployee.reportingManager}
+                  onChange={(e) => setNewEmployee({...newEmployee, reportingManager: e.target.value})}
+                  className="input-field"
+                  required
+                >
+                  <option value="">Select Reporting Manager</option>
+                  {employees.filter(emp => emp.id !== editingEmployee?.id).map(emp => (
+                    <option key={emp.id} value={emp.name}>{emp.name}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  placeholder="Work Location"
+                  value={newEmployee.workLocation}
+                  onChange={(e) => setNewEmployee({...newEmployee, workLocation: e.target.value})}
+                  className="input-field"
+                  required
+                />
+                <div className="md:col-span-2">
+                  <textarea
+                    placeholder="Notes/Remarks (Optional)"
+                    value={newEmployee.notes}
+                    onChange={(e) => setNewEmployee({...newEmployee, notes: e.target.value})}
+                    className="input-field resize-none h-20"
+                  />
+                </div>
+                <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
+                  <button type="submit" className="btn-primary flex-1">
+                    Update Employee
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setShowEditForm(false)
+                      setEditingEmployee(null)
+                      setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '', reportingManager: '', workLocation: '', notes: '' })
+                    }}
+                    className="btn-secondary flex-1"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {employees.map((employee, index) => (
           <motion.div
@@ -378,6 +589,12 @@ const MainFeature = () => {
                 </div>
               </div>
               <button
+              onClick={() => handleEditEmployee(employee)}
+              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 mr-1"
+            >
+              <ApperIcon name="Edit" className="h-4 w-4 text-blue-500" />
+            </button>
+            <button
                 onClick={() => handleDeleteEmployee(employee.id)}
                 className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
               >
