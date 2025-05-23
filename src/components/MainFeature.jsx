@@ -39,10 +39,12 @@ const MainFeature = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null)
   const [attendanceDate, setAttendanceDate] = useState(new Date())
   const [newEmployee, setNewEmployee] = useState({
+    employeeId: '',
     name: '',
     department: '',
     position: '',
-    email: ''
+    email: '',
+    phoneNumber: ''
   })
   const [showAddForm, setShowAddForm] = useState(false)
   const [projects, setProjects] = useState([
@@ -89,7 +91,7 @@ const MainFeature = () => {
 
   const handleAddEmployee = (e) => {
     e.preventDefault()
-    if (newEmployee.name && newEmployee.department && newEmployee.position && newEmployee.email) {
+    if (newEmployee.employeeId && newEmployee.name && newEmployee.email && newEmployee.phoneNumber) {
       const employee = {
         id: employees.length + 1,
         ...newEmployee,
@@ -97,7 +99,7 @@ const MainFeature = () => {
         avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`
       }
       setEmployees([...employees, employee])
-      setNewEmployee({ name: '', department: '', position: '', email: '' })
+      setNewEmployee({ employeeId: '', name: '', department: '', position: '', email: '', phoneNumber: '' })
       setShowAddForm(false)
       toast.success(`Employee ${newEmployee.name} added successfully!`)
     } else {
@@ -210,25 +212,20 @@ const MainFeature = () => {
             <form onSubmit={handleAddEmployee} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 type="text"
+                placeholder="Employee ID"
+                value={newEmployee.employeeId}
+                onChange={(e) => setNewEmployee({...newEmployee, employeeId: e.target.value})}
+                className="input-field"
+                required
+              />
+              <input
+                type="text"
                 placeholder="Full Name"
                 value={newEmployee.name}
                 onChange={(e) => setNewEmployee({...newEmployee, name: e.target.value})}
                 className="input-field"
                 required
               />
-              <select
-                value={newEmployee.department}
-                onChange={(e) => setNewEmployee({...newEmployee, department: e.target.value})}
-                className="input-field"
-                required
-              >
-                <option value="">Select Department</option>
-                {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
-              </select>
-              <input
-                type="text"
                 placeholder="Position"
                 value={newEmployee.position}
                 onChange={(e) => setNewEmployee({...newEmployee, position: e.target.value})}
@@ -240,6 +237,14 @@ const MainFeature = () => {
                 placeholder="Email Address"
                 value={newEmployee.email}
                 onChange={(e) => setNewEmployee({...newEmployee, email: e.target.value})}
+                className="input-field"
+                required
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                value={newEmployee.phoneNumber}
+                onChange={(e) => setNewEmployee({...newEmployee, phoneNumber: e.target.value})}
                 className="input-field"
                 required
               />
