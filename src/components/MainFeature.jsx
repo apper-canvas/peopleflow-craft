@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import { format, addDays, subDays, startOfWeek, endOfWeek } from 'date-fns'
@@ -88,6 +88,20 @@ const MainFeature = () => {
   const [editingProject, setEditingProject] = useState(null)
   const [isEditMode, setIsEditMode] = useState(false)
 
+  // Attendance State
+  const [attendanceRecords, setAttendanceRecords] = useState(() => {
+    const saved = localStorage.getItem('attendanceRecords')
+    return saved ? JSON.parse(saved) : {}
+  })
+
+  // Save attendance to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords))
+  }, [attendanceRecords])
+
+  const [attendanceLoading, setAttendanceLoading] = useState(false)
+  const [isAttendanceFormVisible, setIsAttendanceFormVisible] = useState(false)
+
   const projectStatuses = ['open', 'in-progress', 'completed']
 
   const tabs = [
@@ -148,22 +162,6 @@ const MainFeature = () => {
               position: newEmployee.jobTitle,
               avatar: emp.avatar // Keep existing avatar
 
-  // Attendance State
-  const [attendanceRecords, setAttendanceRecords] = useState(() => {
-    const saved = localStorage.getItem('attendanceRecords')
-    return saved ? JSON.parse(saved) : {}
-  })
-
-  // Save attendance to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords))
-  }, [attendanceRecords])
-
-  const [attendanceLoading, setAttendanceLoading] = useState(false)
-
-  const [isAttendanceFormVisible, setIsAttendanceFormVisible] = useState(false)
-            }
-          : emp
       )
       setEmployees(updatedEmployees)
       setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '', reportingManager: '', workLocation: '', notes: '' })
@@ -178,6 +176,68 @@ const MainFeature = () => {
   const handleDeleteEmployee = (id) => {
     setEmployees(employees.filter(emp => emp.id !== id))
     toast.success('Employee removed successfully')
+  }
+
+  // Attendance functions
+  const handleAttendanceToggle = async (employeeId, employeeName) => {
+    setAttendanceLoading(true)
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      const today = new Date().toISOString().split('T')[0]
+      const currentTime = new Date().toLocaleTimeString('en-US', { 
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+      
+      const recordKey = `${employeeId}-${today}`
+      const existingRecord = attendanceRecords[recordKey]
+      
+      if (!existingRecord) {
+        // Sign in
+        setAttendanceRecords(prev => ({
+          ...prev,
+          [recordKey]: {
+            employeeId,
+            employeeName,
+            date: today,
+            checkIn: currentTime,
+            checkOut: null
+          }
+        }))
+        toast.success(`${employeeName} signed in at ${currentTime}`)
+      } else if (!existingRecord.checkOut) {
+        // Sign out
+        setAttendanceRecords(prev => ({
+          ...prev,
+          [recordKey]: {
+            ...existingRecord,
+            checkOut: currentTime
+          }
+        }))
+        toast.success(`${employeeName} signed out at ${currentTime}`)
+      } else {
+        toast.warning(`${employeeName} has already completed attendance for today`)
+      }
+    } catch (error) {
+      toast.error('Failed to update attendance. Please try again.')
+    } finally {
+      setAttendanceLoading(false)
+    }
+  }
+
+  const getAttendanceStatus = (employeeId) => {
+    const today = new Date().toISOString().split('T')[0]
+    const recordKey = `${employeeId}-${today}`
+    const record = attendanceRecords[recordKey]
+    
+    if (!record) return { status: 'not-signed-in', checkIn: null, checkOut: null }
+    if (record.checkIn && !record.checkOut) return { status: 'signed-in', checkIn: record.checkIn, checkOut: null }
+    if (record.checkIn && record.checkOut) return { status: 'completed', checkIn: record.checkIn, checkOut: record.checkOut }
+    
+    return { status: 'not-signed-in', checkIn: null, checkOut: null }
   }
 
   const handleAddProject = (e) => {
@@ -459,68 +519,6 @@ const MainFeature = () => {
                   type="email"
                   placeholder="Email Address"
                   value={newEmployee.email}
-                  onChange={(e) => setNewEmployee({...newEmployee, email: e.target.value})}
-  // Attendance functions
-  const handleAttendanceToggle = async (employeeId, employeeName) => {
-    setAttendanceLoading(true)
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      const today = new Date().toISOString().split('T')[0]
-      const currentTime = new Date().toLocaleTimeString('en-US', { 
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-      
-      const recordKey = `${employeeId}-${today}`
-      const existingRecord = attendanceRecords[recordKey]
-      
-      if (!existingRecord) {
-        // Sign in
-        setAttendanceRecords(prev => ({
-          ...prev,
-          [recordKey]: {
-            employeeId,
-            employeeName,
-            date: today,
-            checkIn: currentTime,
-            checkOut: null
-          }
-        }))
-        toast.success(`${employeeName} signed in at ${currentTime}`)
-      } else if (!existingRecord.checkOut) {
-        // Sign out
-        setAttendanceRecords(prev => ({
-          ...prev,
-          [recordKey]: {
-            ...existingRecord,
-            checkOut: currentTime
-          }
-        }))
-        toast.success(`${employeeName} signed out at ${currentTime}`)
-      } else {
-        toast.warning(`${employeeName} has already completed attendance for today`)
-      }
-    } catch (error) {
-      toast.error('Failed to update attendance. Please try again.')
-    } finally {
-      setAttendanceLoading(false)
-    }
-  }
-
-  const getAttendanceStatus = (employeeId) => {
-    const today = new Date().toISOString().split('T')[0]
-    const recordKey = `${employeeId}-${today}`
-    const record = attendanceRecords[recordKey]
-    
-    if (!record) return { status: 'not-signed-in', checkIn: null, checkOut: null }
-    if (record.checkIn && !record.checkOut) return { status: 'signed-in', checkIn: record.checkIn, checkOut: null }
-    if (record.checkIn && record.checkOut) return { status: 'completed', checkIn: record.checkIn, checkOut: record.checkOut }
-    
-    return { status: 'not-signed-in', checkIn: null, checkOut: null }
-  }
 
                   className="input-field"
                   required
@@ -700,6 +698,102 @@ const MainFeature = () => {
   )
 
   const renderAttendanceTracking = () => (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h3 className="text-xl md:text-2xl font-semibold text-surface-900 dark:text-surface-100">
+          Attendance Management
+        </h3>
+        <div className="flex items-center space-x-2">
+          <input
+            type="date"
+            value={format(attendanceDate, 'yyyy-MM-dd')}
+            onChange={(e) => setAttendanceDate(new Date(e.target.value))}
+            className="input-field text-sm"
+          />
+        </div>
+      </div>
+
+      <div className="card p-4 md:p-6">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-surface-200 dark:border-surface-700">
+                <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Employee</th>
+                <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Check-In</th>
+                <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Check-Out</th>
+                <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-surface-200 dark:divide-surface-700">
+              {employees.map((employee) => {
+                const attendanceStatus = getAttendanceStatus(employee.id)
+                return (
+                  <tr key={employee.id} className="hover:bg-surface-50 dark:hover:bg-surface-800/50">
+                    <td className="py-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm font-medium">
+                            {employee.name.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-surface-900 dark:text-surface-100">{employee.name}</p>
+                          <p className="text-sm text-surface-600 dark:text-surface-400">{employee.position}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4">
+                      {attendanceStatus.checkIn ? (
+                        <span className="text-green-600 dark:text-green-400 font-medium">
+                          {attendanceStatus.checkIn}
+                        </span>
+                      ) : (
+                        <span className="text-surface-400 dark:text-surface-500">-</span>
+                      )}
+                    </td>
+                    <td className="py-4">
+                      {attendanceStatus.checkOut ? (
+                        <span className="text-blue-600 dark:text-blue-400 font-medium">
+                          {attendanceStatus.checkOut}
+                        </span>
+                      ) : (
+                        <span className="text-surface-400 dark:text-surface-500">-</span>
+                      )}
+                    </td>
+                    <td className="py-4">
+                      {attendanceStatus.status === 'completed' ? (
+                        <span className="px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-full text-sm font-medium">
+                          Completed
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleAttendanceToggle(employee.id, employee.name)}
+                          disabled={attendanceLoading}
+                          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                            attendanceStatus.status === 'not-signed-in'
+                              ? 'bg-green-500 hover:bg-green-600 text-white'
+                              : 'bg-blue-500 hover:bg-blue-600 text-white'
+                          }`}
+                        >
+                          {attendanceLoading ? (
+                            <ApperIcon name="Loader2" className="h-4 w-4 animate-spin" />
+                          ) : (
+                            attendanceStatus.status === 'not-signed-in' ? 'Sign In' : 'Sign Out'
+                          )}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderOldAttendanceTracking = () => (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h3 className="text-xl md:text-2xl font-semibold text-surface-900 dark:text-surface-100">
@@ -1062,630 +1156,6 @@ const MainFeature = () => {
         </motion.div>
       </AnimatePresence>
     </motion.div>
-  )
-}
-
-export default MainFeature
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-surface-200 dark:border-surface-700">
-                        <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Employee</th>
-                        <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Check-In</th>
-                        <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Check-Out</th>
-                        <th className="text-left py-3 text-surface-700 dark:text-surface-300 font-medium">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-surface-200 dark:divide-surface-700">
-                      {employees.map((employee) => {
-                        const attendanceStatus = getAttendanceStatus(employee.id)
-                        return (
-                          <tr key={employee.id} className="hover:bg-surface-50 dark:hover:bg-surface-800/50">
-                            <td className="py-4">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-                                  <span className="text-white text-sm font-medium">
-                                    {employee.name.split(' ').map(n => n[0]).join('')}
-                                  </span>
-                                </div>
-                                <div>
-                                  <p className="font-medium text-surface-900 dark:text-surface-100">{employee.name}</p>
-                                  <p className="text-sm text-surface-600 dark:text-surface-400">{employee.position}</p>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="py-4">
-                              {attendanceStatus.checkIn ? (
-                                <span className="text-green-600 dark:text-green-400 font-medium">
-                                  {attendanceStatus.checkIn}
-                                </span>
-                              ) : (
-                                <span className="text-surface-400 dark:text-surface-500">-</span>
-                              )}
-                            </td>
-                            <td className="py-4">
-                              {attendanceStatus.checkOut ? (
-                                <span className="text-blue-600 dark:text-blue-400 font-medium">
-                                  {attendanceStatus.checkOut}
-                                </span>
-                              ) : (
-                                <span className="text-surface-400 dark:text-surface-500">-</span>
-                              )}
-                            </td>
-                            <td className="py-4">
-                              {attendanceStatus.status === 'completed' ? (
-                                <span className="px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-full text-sm font-medium">
-                                  Completed
-                                </span>
-                              ) : (
-                                <button
-                                  onClick={() => handleAttendanceToggle(employee.id, employee.name)}
-                                  disabled={attendanceLoading}
-                                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
-                                    attendanceStatus.status === 'not-signed-in'
-                                      ? 'bg-green-500 hover:bg-green-600 text-white'
-                                      : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                  }`}
-                                >
-                                  {attendanceLoading ? (
-                                    <ApperIcon name="Loader2" className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    attendanceStatus.status === 'not-signed-in' ? 'Sign In' : 'Sign Out'
-                                  )}
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Attendance Management Section */}
-          {activeSection === 'projects' && (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Projects</h2>
-                <button 
-                  onClick={() => setIsProjectFormVisible(!isProjectFormVisible)}
-                  className="btn-primary flex items-center space-x-2"
-                >
-                  <ApperIcon name="Plus" className="h-4 w-4" />
-                  <span>Add Project</span>
-                </button>
-              </div>
-
-              {/* Project Form */}
-              {isProjectFormVisible && (
-                <motion.div 
-                  className="card p-6"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <h3 className="text-xl font-bold text-surface-900 dark:text-surface-100 mb-6">Add New Project</h3>
-                  <form onSubmit={handleAddProject} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                        Project Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={newProject.name}
-                        onChange={(e) => setNewProject({...newProject, name: e.target.value})}
-                        className="input-field"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                        Status
-                      </label>
-                      <select
-                        value={newProject.status}
-                        onChange={(e) => setNewProject({...newProject, status: e.target.value})}
-                        className="input-field"
-                      >
-                        <option value="Planning">Planning</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="On Hold">On Hold</option>
-                        <option value="Completed">Completed</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                        Priority
-                      </label>
-                      <select
-                        value={newProject.priority}
-                        onChange={(e) => setNewProject({...newProject, priority: e.target.value})}
-                        className="input-field"
-                      >
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                        <option value="Critical">Critical</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                        Team Lead
-                      </label>
-                      <select
-                        value={newProject.teamLead}
-                        onChange={(e) => setNewProject({...newProject, teamLead: e.target.value})}
-                        className="input-field"
-                      >
-                        <option value="">Select Team Lead</option>
-                        {employees.map(emp => (
-                          <option key={emp.id} value={emp.name}>{emp.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                        Start Date
-                      </label>
-                      <input
-                        type="date"
-                        value={newProject.startDate}
-                        onChange={(e) => setNewProject({...newProject, startDate: e.target.value})}
-                        className="input-field"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                        End Date
-                      </label>
-                      <input
-                        type="date"
-                        value={newProject.endDate}
-                        onChange={(e) => setNewProject({...newProject, endDate: e.target.value})}
-                        className="input-field"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                        Description
-                      </label>
-                      <textarea
-                        value={newProject.description}
-                        onChange={(e) => setNewProject({...newProject, description: e.target.value})}
-                        className="input-field h-24"
-                        placeholder="Project description and objectives"
-                      />
-                    </div>
-                    <div className="md:col-span-2 flex gap-4">
-                      <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                      >
-                        {isLoading && <ApperIcon name="Loader2" className="h-4 w-4 animate-spin" />}
-                        <span>{isLoading ? 'Adding...' : 'Add Project'}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setIsProjectFormVisible(false)}
-                        className="btn-secondary"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                </motion.div>
-              )}
-
-              {/* Projects Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {projects.map((project) => (
-                  <motion.div
-                    key={project.id}
-                    className="card p-6 hover:shadow-soft transition-all duration-200"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-surface-900 dark:text-surface-100 mb-2">
-                          {project.name}
-                        </h3>
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
-                            {project.status}
-                          </span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(project.priority)}`}>
-                            {project.priority}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <button 
-                          onClick={() => handleEditProject(project)}
-                          className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-200"
-                          title="Edit Project"
-                        >
-                          <ApperIcon name="Edit" className="h-4 w-4" />
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteProject(project.id)}
-                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
-                          title="Delete Project"
-                        >
-                          <ApperIcon name="Trash2" className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <p className="text-surface-600 dark:text-surface-400 text-sm mb-4 line-clamp-2">
-                      {project.description}
-                    </p>
-
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="text-surface-600 dark:text-surface-400">Team Lead:</span>
-                        <span className="text-surface-900 dark:text-surface-100 font-medium">
-                          {project.teamLead || 'Not assigned'}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-surface-600 dark:text-surface-400">Start:</span>
-                        <span className="text-surface-900 dark:text-surface-100">
-                          {project.startDate || 'Not set'}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-surface-600 dark:text-surface-400">End:</span>
-                        <span className="text-surface-900 dark:text-surface-100">
-                          {project.endDate || 'Not set'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Progress bar placeholder */}
-                    <div className="mt-4">
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-surface-600 dark:text-surface-400">Progress</span>
-                        <span className="text-surface-900 dark:text-surface-100 font-medium">
-                          {project.status === 'Completed' ? '100%' : 
-                           project.status === 'In Progress' ? '60%' : 
-                           project.status === 'Planning' ? '25%' : '0%'}
-                        </span>
-                      </div>
-                      <div className="w-full bg-surface-200 dark:bg-surface-700 rounded-full h-2">
-                        <div 
-                          className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-300"
-                          style={{ 
-                            width: project.status === 'Completed' ? '100%' : 
-                                   project.status === 'In Progress' ? '60%' : 
-                                   project.status === 'Planning' ? '25%' : '0%'
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {projects.length === 0 && (
-                <div className="text-center py-12">
-                  <ApperIcon name="FolderOpen" className="h-16 w-16 text-surface-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-2">No projects yet</h3>
-                  <p className="text-surface-600 dark:text-surface-400 mb-4">Get started by adding your first project</p>
-                  <button 
-                    onClick={() => setIsProjectFormVisible(true)}
-                    className="btn-primary"
-                  >
-                    Add Project
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Edit Employee Modal */}
-        {showEditModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <motion.div 
-              className="bg-white dark:bg-surface-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-                  Edit Employee
-                </h3>
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors duration-200"
-                >
-                  <ApperIcon name="X" className="h-5 w-5" />
-                </button>
-              </div>
-
-              <form onSubmit={handleEditEmployee} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingEmployee.name}
-                    onChange={(e) => setEditingEmployee({...editingEmployee, name: e.target.value})}
-                    className="input-field"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    value={editingEmployee.email}
-                    onChange={(e) => setEditingEmployee({...editingEmployee, email: e.target.value})}
-                    className="input-field"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    value={editingEmployee.phone}
-                    onChange={(e) => setEditingEmployee({...editingEmployee, phone: e.target.value})}
-                    className="input-field"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Position *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingEmployee.position}
-                    onChange={(e) => setEditingEmployee({...editingEmployee, position: e.target.value})}
-                    className="input-field"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Department *
-                  </label>
-                  <select
-                    value={editingEmployee.department}
-                    onChange={(e) => setEditingEmployee({...editingEmployee, department: e.target.value})}
-                    className="input-field"
-                    required
-                  >
-                    <option value="">Select Department</option>
-                    <option value="Engineering">Engineering</option>
-                    <option value="Design">Design</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Sales">Sales</option>
-                    <option value="HR">Human Resources</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Operations">Operations</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={editingEmployee.startDate}
-                    onChange={(e) => setEditingEmployee({...editingEmployee, startDate: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Salary
-                  </label>
-                  <input
-                    type="text"
-                    value={editingEmployee.salary}
-                    onChange={(e) => setEditingEmployee({...editingEmployee, salary: e.target.value})}
-                    className="input-field"
-                    placeholder="e.g., $75,000"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Status
-                  </label>
-                  <select
-                    value={editingEmployee.status}
-                    onChange={(e) => setEditingEmployee({...editingEmployee, status: e.target.value})}
-                    className="input-field"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="On Leave">On Leave</option>
-                  </select>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Notes/Remarks
-                  </label>
-                  <textarea
-                    value={editingEmployee.notes}
-                    onChange={(e) => setEditingEmployee({...editingEmployee, notes: e.target.value})}
-                    className="input-field h-24"
-                    placeholder="Additional notes or remarks about the employee"
-                  />
-                </div>
-                <div className="md:col-span-2 flex gap-4">
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                  >
-                    {isLoading && <ApperIcon name="Loader2" className="h-4 w-4 animate-spin" />}
-                    <span>{isLoading ? 'Updating...' : 'Update Employee'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowEditModal(false)}
-                    className="btn-secondary"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-
-        {/* Edit Project Modal */}
-        {showEditProjectModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <motion.div 
-              className="bg-white dark:bg-surface-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-                  Edit Project
-                </h3>
-                <button
-                  onClick={() => setShowEditProjectModal(false)}
-                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors duration-200"
-                >
-                  <ApperIcon name="X" className="h-5 w-5" />
-                </button>
-              </div>
-
-              <form onSubmit={handleEditProject} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Project Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingProject.name}
-                    onChange={(e) => setEditingProject({...editingProject, name: e.target.value})}
-                    className="input-field"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Status
-                  </label>
-                  <select
-                    value={editingProject.status}
-                    onChange={(e) => setEditingProject({...editingProject, status: e.target.value})}
-                    className="input-field"
-                  >
-                    <option value="Planning">Planning</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="On Hold">On Hold</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Priority
-                  </label>
-                  <select
-                    value={editingProject.priority}
-                    onChange={(e) => setEditingProject({...editingProject, priority: e.target.value})}
-                    className="input-field"
-                  >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    <option value="Critical">Critical</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Team Lead
-                  </label>
-                  <select
-                    value={editingProject.teamLead}
-                    onChange={(e) => setEditingProject({...editingProject, teamLead: e.target.value})}
-                    className="input-field"
-                  >
-                    <option value="">Select Team Lead</option>
-                    {employees.map(emp => (
-                      <option key={emp.id} value={emp.name}>{emp.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={editingProject.startDate}
-                    onChange={(e) => setEditingProject({...editingProject, startDate: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={editingProject.endDate}
-                    onChange={(e) => setEditingProject({...editingProject, endDate: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    value={editingProject.description}
-                    onChange={(e) => setEditingProject({...editingProject, description: e.target.value})}
-                    className="input-field h-24"
-                    placeholder="Project description and objectives"
-                  />
-                </div>
-                <div className="md:col-span-2 flex gap-4">
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                  >
-                    {isLoading && <ApperIcon name="Loader2" className="h-4 w-4 animate-spin" />}
-                    <span>{isLoading ? 'Updating...' : 'Update Project'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowEditProjectModal(false)}
-                    className="btn-secondary"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </div>
-    </div>
   )
 }
 
