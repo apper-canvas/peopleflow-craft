@@ -5,6 +5,7 @@ import { format, addDays, subDays, startOfWeek, endOfWeek } from 'date-fns'
 import ApperIcon from './ApperIcon'
 
 const MainFeature = forwardRef((props, ref) => {
+  const elementRef = useRef(null)
   const [activeTab, setActiveTab] = useState('employees')
   const [employees, setEmployees] = useState([
     {
@@ -122,7 +123,9 @@ const MainFeature = forwardRef((props, ref) => {
           setShowAddForm(true)
         }, 300)
       }
-    }
+    },
+    scrollIntoView: (options) => elementRef.current?.scrollIntoView(options),
+    element: elementRef.current
   }))
 
   const handleAddEmployee = (e) => {
@@ -1343,6 +1346,7 @@ const MainFeature = forwardRef((props, ref) => {
 
   return (
     <motion.div 
+      ref={elementRef}
       className="w-full max-w-7xl mx-auto"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}

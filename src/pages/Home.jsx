@@ -10,10 +10,10 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
   const handleQuickAction = (action) => {
     if (action === 'Add Employee') {
       mainFeatureRef.current?.activateTab('employees')
-      mainFeatureRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setTimeout(() => mainFeatureRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
     } else if (action === 'Track Attendance') {
       mainFeatureRef.current?.activateTab('attendance')
-      mainFeatureRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setTimeout(() => mainFeatureRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
     } else if (action === 'Performance Review') {
       window.location.href = '/performance-metrics'
     }
@@ -69,14 +69,6 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
                 <span>Employee Portal</span>
               </Link>
               <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-2 rounded-lg bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 transition-all duration-200 shadow-card"
-              >
-                <ApperIcon 
-                  name={isDarkMode ? "Sun" : "Moon"} 
-                  className="h-5 w-5 text-surface-700 dark:text-surface-300" 
-                />
-              </button>
               <div className="hidden sm:flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
                 <ApperIcon name="Users" className="h-4 w-4" />
                 <span>Admin Dashboard</span>
