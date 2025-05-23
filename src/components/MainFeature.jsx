@@ -46,7 +46,9 @@ const MainFeature = () => {
     dateOfBirth: '',
     gender: '',
     department: '',
-    jobTitle: ''
+    jobTitle: '',
+    employmentType: '',
+    dateJoining: ''
   })
   const [showAddForm, setShowAddForm] = useState(false)
   const [projects, setProjects] = useState([
@@ -93,7 +95,7 @@ const MainFeature = () => {
 
   const handleAddEmployee = (e) => {
     e.preventDefault()
-    if (newEmployee.employeeId && newEmployee.name && newEmployee.email && newEmployee.phoneNumber && newEmployee.department && newEmployee.jobTitle) {
+    if (newEmployee.employeeId && newEmployee.name && newEmployee.email && newEmployee.phoneNumber && newEmployee.department && newEmployee.jobTitle && newEmployee.employmentType && newEmployee.dateJoining) {
       const employee = {
         id: employees.length + 1,
         ...newEmployee,
@@ -102,7 +104,7 @@ const MainFeature = () => {
         avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`
       }
       setEmployees([...employees, employee])
-      setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '' })
+      setNewEmployee({ employeeId: '', name: '', email: '', phoneNumber: '', dateOfBirth: '', gender: '', department: '', jobTitle: '', employmentType: '', dateJoining: '' })
       setShowAddForm(false)
       toast.success(`Employee ${newEmployee.name} added successfully!`)
     } else {
@@ -280,6 +282,25 @@ const MainFeature = () => {
                 placeholder="Job Title"
                 value={newEmployee.jobTitle}
                 onChange={(e) => setNewEmployee({...newEmployee, jobTitle: e.target.value})}
+                className="input-field"
+                required
+              />
+              <select
+                value={newEmployee.employmentType}
+                onChange={(e) => setNewEmployee({...newEmployee, employmentType: e.target.value})}
+                className="input-field"
+                required
+              >
+                <option value="">Select Employment Type</option>
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract">Contract</option>
+              </select>
+              <input
+                type="date"
+                placeholder="Date Joining"
+                value={newEmployee.dateJoining}
+                onChange={(e) => setNewEmployee({...newEmployee, dateJoining: e.target.value})}
                 className="input-field"
                 required
               />
