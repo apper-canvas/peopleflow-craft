@@ -164,6 +164,8 @@ const MainFeature = () => {
     setShowProjectForm(true)
   }
 
+  const toggleEmployeeAssignment = (employeeId) => {
+    setNewProject(prev => ({
       ...prev,
       assignedEmployees: prev.assignedEmployees.includes(employeeId)
         ? prev.assignedEmployees.filter(id => id !== employeeId)
@@ -631,6 +633,7 @@ const MainFeature = () => {
     </div>
   )
 
+  return (
     <motion.div 
       className="w-full max-w-7xl mx-auto"
       initial={{ opacity: 0, y: 20 }}
@@ -675,7 +678,6 @@ const MainFeature = () => {
       </AnimatePresence>
     </motion.div>
   )
-  return (
 }
 
 export default MainFeature
