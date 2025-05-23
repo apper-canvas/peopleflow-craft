@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
 import EmployeeSelfService from './components/EmployeeSelfService'
+import PerformanceMetrics from './components/PerformanceMetrics'
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -21,6 +22,10 @@ function App() {
             <Route 
               path="/employee-portal" 
               element={<EmployeeSelfService isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />} 
+            />
+            <Route 
+              path="/performance-metrics" 
+              element={<PerformanceMetrics isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />} 
             />
             <Route path="*" element={<NotFound />} />
           </Routes>
