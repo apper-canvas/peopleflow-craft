@@ -228,6 +228,7 @@ const MainFeature = () => {
                 className="input-field"
                 required
               />
+              <input
                 type="date"
                 placeholder="Date of Birth"
                 value={newEmployee.dateOfBirth}
@@ -246,7 +247,6 @@ const MainFeature = () => {
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
-              <input
               <input
                 type="text"
                 placeholder="Position"
