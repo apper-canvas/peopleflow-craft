@@ -45,6 +45,31 @@ const MainFeature = () => {
     email: ''
   })
   const [showAddForm, setShowAddForm] = useState(false)
+  const [projects, setProjects] = useState([
+    {
+      id: 1,
+      name: "E-commerce Platform",
+      description: "Building a modern e-commerce platform with React and Node.js",
+      status: "in-progress",
+      assignedEmployees: [1, 2],
+      deadline: addDays(new Date(), 30)
+    },
+    {
+      id: 2,
+      name: "Mobile App Redesign", 
+      description: "Complete redesign of the mobile application interface",
+      status: "planning",
+      assignedEmployees: [2, 3],
+      deadline: addDays(new Date(), 45)
+    }
+  ])
+  const [newProject, setNewProject] = useState({
+    name: '',
+    description: '',
+    deadline: '',
+    assignedEmployees: []
+  })
+  const [showProjectForm, setShowProjectForm] = useState(false)
 
   const tabs = [
     { id: 'employees', label: 'Employee Management', icon: 'Users' },
@@ -77,27 +102,38 @@ const MainFeature = () => {
     toast.success('Employee removed successfully')
   }
 
+  const handleAddProject = (e) => {
+    e.preventDefault()
+    if (newProject.name && newProject.description && newProject.deadline) {
+      const project = {
+        id: projects.length + 1,
+        ...newProject,
+        status: 'planning',
+        deadline: new Date(newProject.deadline),
+        assignedEmployees: newProject.assignedEmployees
+      }
+      setProjects([...projects, project])
+      setNewProject({ name: '', description: '', deadline: '', assignedEmployees: [] })
+      setShowProjectForm(false)
+      toast.success(`Project "${newProject.name}" created successfully!`)
+    } else {
+      toast.error('Please fill in all required fields')
+    }
+  }
+
+  const toggleEmployeeAssignment = (employeeId) => {
+    setNewProject(prev => ({
+      ...prev,
+      assignedEmployees: prev.assignedEmployees.includes(employeeId)
+        ? prev.assignedEmployees.filter(id => id !== employeeId)
+        : [...prev.assignedEmployees, employeeId]
+    }))
+  }
+
   const mockAttendance = [
     { employeeId: 1, date: format(new Date(), 'yyyy-MM-dd'), checkIn: '09:00', checkOut: '17:30', status: 'present' },
     { employeeId: 2, date: format(new Date(), 'yyyy-MM-dd'), checkIn: '09:15', checkOut: '17:45', status: 'present' },
     { employeeId: 3, date: format(new Date(), 'yyyy-MM-dd'), checkIn: '--', checkOut: '--', status: 'absent' }
-  ]
-
-  const projects = [
-    {
-      id: 1,
-      name: "E-commerce Platform",
-      status: "in-progress",
-      assignedEmployees: [1, 2],
-      deadline: addDays(new Date(), 30)
-    },
-    {
-      id: 2,
-      name: "Mobile App Redesign",
-      status: "planning",
-      assignedEmployees: [2, 3],
-      deadline: addDays(new Date(), 45)
-    }
   ]
 
   const renderEmployeeManagement = () => (
@@ -314,11 +350,99 @@ const MainFeature = () => {
         <h3 className="text-xl md:text-2xl font-semibold text-surface-900 dark:text-surface-100">
           Project Assignments
         </h3>
-        <button className="btn-primary flex items-center space-x-2">
+        <motion.button
+          onClick={() => setShowProjectForm(!showProjectForm)}
+          className="btn-primary flex items-center space-x-2"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
           <ApperIcon name="Plus" className="h-4 w-4" />
           <span>New Project</span>
-        </button>
+        </motion.button>
       </div>
+
+      <AnimatePresence>
+        {showProjectForm && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="card p-4 md:p-6"
+          >
+            <h4 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">
+              Create New Project
+            </h4>
+            <form onSubmit={handleAddProject} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="Project Name"
+                  value={newProject.name}
+                  onChange={(e) => setNewProject({...newProject, name: e.target.value})}
+                  className="input-field"
+                  required
+                />
+                <input
+                  type="date"
+                  value={newProject.deadline}
+                  onChange={(e) => setNewProject({...newProject, deadline: e.target.value})}
+                  className="input-field"
+                  required
+                />
+              </div>
+              <textarea
+                placeholder="Project Description"
+                value={newProject.description}
+                onChange={(e) => setNewProject({...newProject, description: e.target.value})}
+                className="input-field resize-none h-24"
+                required
+              />
+              
+              <div>
+                <label className="block text-sm font-medium text-surface-900 dark:text-surface-100 mb-2">
+                  Assign Team Members (Optional)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {employees.map((employee) => (
+                    <label 
+                      key={employee.id}
+                      className="flex items-center space-x-3 p-3 rounded-lg border border-surface-200 dark:border-surface-600 hover:bg-surface-50 dark:hover:bg-surface-700/50 cursor-pointer transition-colors duration-200"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={newProject.assignedEmployees.includes(employee.id)}
+                        onChange={() => toggleEmployeeAssignment(employee.id)}
+                        className="rounded border-surface-300 dark:border-surface-600 text-primary focus:ring-primary/50"
+                      />
+                      <img
+                        src={employee.avatar}
+                        alt={employee.name}
+                        className="w-6 h-6 rounded-full object-cover"
+                      />
+                      <span className="text-sm text-surface-900 dark:text-surface-100">
+                        {employee.name}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button type="submit" className="btn-primary flex-1">
+                  Create Project
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => setShowProjectForm(false)}
+                  className="btn-secondary flex-1"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {projects.map((project, index) => (
@@ -340,6 +464,12 @@ const MainFeature = () => {
               }`}>
                 {project.status.replace('-', ' ')}
               </span>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-sm text-surface-600 dark:text-surface-400">
+                {project.description}
+              </p>
             </div>
 
             <div className="space-y-4">
