@@ -1099,7 +1099,7 @@ const MainFeature = forwardRef((props, ref) => {
   )
 
   const renderProjectAssignments = () => (
-    <div className="space-y-6 bg-project-workspace bg-project-overlay rounded-2xl p-6 relative">
+    <div className="space-y-6 bg-project-light rounded-2xl p-6 relative">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h3 className="text-xl md:text-2xl font-semibold text-surface-900 dark:text-surface-100">
           Project Assignments
@@ -1121,7 +1121,7 @@ const MainFeature = forwardRef((props, ref) => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="card p-4 md:p-6 backdrop-blur-sm bg-white/95 dark:bg-surface-800/95"
+            className="card p-4 md:p-6 backdrop-blur-sm bg-white/98 dark:bg-surface-800/95"
           >
             <h4 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">
               {isEditMode ? 'Edit Project' : 'Create New Project'}
@@ -1264,7 +1264,7 @@ const MainFeature = forwardRef((props, ref) => {
         {projects.map((project, index) => (
           <motion.div
             key={project.id}
-            className="card p-4 md:p-6 hover:shadow-soft transition-all duration-300 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90 border border-white/20"
+            className="card p-4 md:p-6 hover:shadow-soft transition-all duration-300 backdrop-blur-sm bg-white/95 dark:bg-surface-800/90 border border-white/20"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.2 }}

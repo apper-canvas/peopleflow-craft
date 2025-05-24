@@ -13,7 +13,7 @@ function App() {
   return (
     <div className={isDarkMode ? 'dark' : ''}>
       <Router>
-        <div className="min-h-screen bg-gradient-to-br from-surface-50 to-surface-100 dark:from-surface-900 dark:to-surface-800 transition-colors duration-300">
+        <div className="min-h-screen bg-gradient-to-br from-white via-surface-50 to-surface-100 dark:from-surface-900 dark:to-surface-800 transition-colors duration-300">
           <Routes>
             <Route 
               path="/" 
