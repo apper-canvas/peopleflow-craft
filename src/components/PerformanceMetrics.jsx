@@ -237,7 +237,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-analytics-dashboard bg-project-overlay">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-surface-200 dark:border-surface-700">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -308,7 +308,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="card p-4 md:p-6">
+          <div className="card p-4 md:p-6 backdrop-blur-sm bg-white/95 dark:bg-surface-800/95">
             <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">
               Filters & Controls
             </h3>
@@ -369,7 +369,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <div className="card p-6">
+          <div className="card p-6 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90">
             <div className="flex items-center justify-between mb-4">
               <ApperIcon name="Clock" className="h-8 w-8 text-blue-500" />
               <span className="text-sm text-green-600 dark:text-green-400 font-medium">↗ 8%</span>
@@ -380,7 +380,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
             <p className="text-surface-600 dark:text-surface-400">Avg Project Completion</p>
           </div>
 
-          <div className="card p-6">
+          <div className="card p-6 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90">
             <div className="flex items-center justify-between mb-4">
               <ApperIcon name="Heart" className="h-8 w-8 text-red-500" />
               <span className="text-sm text-green-600 dark:text-green-400 font-medium">↗ 5%</span>
@@ -391,7 +391,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
             <p className="text-surface-600 dark:text-surface-400">Employee Engagement</p>
           </div>
 
-          <div className="card p-6">
+          <div className="card p-6 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90">
             <div className="flex items-center justify-between mb-4">
               <ApperIcon name="TrendingUp" className="h-8 w-8 text-green-500" />
               <span className="text-sm text-green-600 dark:text-green-400 font-medium">↗ 12%</span>
@@ -402,7 +402,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
             <p className="text-surface-600 dark:text-surface-400">Productivity Growth</p>
           </div>
 
-          <div className="card p-6">
+          <div className="card p-6 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90">
             <div className="flex items-center justify-between mb-4">
               <ApperIcon name="Users" className="h-8 w-8 text-purple-500" />
               <span className="text-sm text-green-600 dark:text-green-400 font-medium">↗ 3%</span>
@@ -416,7 +416,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
 
         {/* Gauge Charts */}
         <motion.div 
-          className="card p-6 mb-8"
+          className="card p-6 mb-8 backdrop-blur-sm bg-white/95 dark:bg-surface-800/95"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
@@ -452,7 +452,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Performance Trend */}
           <motion.div 
-            className="card p-6"
+            className="card p-6 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -467,7 +467,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
 
           {/* Department Performance */}
           <motion.div 
-            className="card p-6"
+            className="card p-6 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
@@ -482,7 +482,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
 
           {/* Project Status */}
           <motion.div 
-            className="card p-6"
+            className="card p-6 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90 bg-task-management"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
@@ -505,7 +505,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
 
           {/* Employee Engagement Trend */}
           <motion.div 
-            className="card p-6"
+            className="card p-6 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.7 }}
@@ -521,7 +521,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
 
         {/* Employee Performance Table */}
         <motion.div 
-          className="card p-6"
+          className="card p-6 backdrop-blur-sm bg-white/95 dark:bg-surface-800/95"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.8 }}

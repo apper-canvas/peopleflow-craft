@@ -20,7 +20,7 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-team-collaboration bg-project-overlay">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-surface-200 dark:border-surface-700">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -110,7 +110,7 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
           ].map((stat, index) => (
             <motion.div
               key={stat.label}
-              className="card p-4 md:p-6 hover:shadow-soft transform hover:-translate-y-1 transition-all duration-300"
+              className="card p-4 md:p-6 hover:shadow-soft transform hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90"
               whileHover={{ scale: 1.02 }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -169,7 +169,7 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
               <motion.div
                 key={action.title}
                 onClick={() => handleQuickAction(action.title)}
-                className="group card p-6 hover:shadow-soft cursor-pointer transition-all duration-300"
+                className="group card p-6 hover:shadow-soft cursor-pointer transition-all duration-300 backdrop-blur-sm bg-white/90 dark:bg-surface-800/90 border border-white/20"
                 whileHover={{ y: -4 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
