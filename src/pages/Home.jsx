@@ -73,6 +73,7 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
                 <span>Admin Dashboard</span>
               </div>
             </div>
+          </div>
         </div>
       </header>
 
