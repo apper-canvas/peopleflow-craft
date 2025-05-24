@@ -309,7 +309,7 @@ const PerformanceMetrics = ({ isDarkMode, setIsDarkMode }) => {
           transition={{ duration: 0.5 }}
         >
           <div className="card p-4 md:p-6 backdrop-blur-sm bg-white/95 dark:bg-surface-800/95">
-          <div className="card p-4 md:p-6 backdrop-blur-sm bg-white/98 dark:bg-surface-800/95">
+            <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">
               Filters & Controls
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
