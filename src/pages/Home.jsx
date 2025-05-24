@@ -72,6 +72,7 @@ const Home = ({ isDarkMode, setIsDarkMode }) => {
                 <ApperIcon name="Users" className="h-4 w-4" />
                 <span>Admin Dashboard</span>
               </div>
+            </div>
         </div>
       </header>
 
